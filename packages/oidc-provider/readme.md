@@ -44,34 +44,34 @@ import {MemoryAdapter} from "../adapters/MemoryAdapter";
 export const rootDir = __dirname;
 
 @Configuration({
-   
+   oidc: {
+     jwksPath: `${rootDir}/../keys/jwks.json`, // don't forget add this path to .gitignore 
+     Adapter: MemoryAdapter,
+     Accounts: Accounts,
+     // Clients: Clients,
+     clients: [
+       {
+         client_id: "client_id",
+         client_secret: "client_secret",
+         redirect_uris: [
+           "https://host.fr/"
+         ]
+       }
+     ],
+     options: { // Oidc-provider options See https://github.com/panva/node-oidc-provider/blob/master/docs/README.md
+       formats: {
+         AccessToken: "jwt"
+       },
+       features: {
+         encryption: {enabled: true},
+         introspection: {enabled: true},
+         revocation: {enabled: true}
+       }
+     }
+   }
 })
 export class Server {
-  oidc: {
-    jwksPath: `${rootDir}/../keys/jwks.json`, // don't forget add this path to .gitignore 
-    Adapter: MemoryAdapter,
-    Accounts: Accounts,
-    // Clients: Clients,
-    clients: [
-      {
-        client_id: "client_id",
-        client_secret: "client_secret",
-        redirect_uris: [
-          "https://host.fr/"
-        ]
-      }
-    ],
-    options: { // Oidc-provider options See https://github.com/panva/node-oidc-provider/blob/master/docs/README.md
-      formats: {
-        AccessToken: "jwt"
-      },
-      features: {
-        encryption: {enabled: true},
-        introspection: {enabled: true},
-        revocation: {enabled: true}
-      }
-    }
-  }
+  
 }
 ```
 

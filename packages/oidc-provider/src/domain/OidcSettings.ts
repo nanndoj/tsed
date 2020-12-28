@@ -1,6 +1,5 @@
 import {Type} from "@tsed/core";
 import {ClientMetadata, Configuration} from "oidc-provider";
-import {OidcAdapter} from "./OidcAdapter";
 import {OidcAccountsMethods} from "./OidcAccountsMethods";
 import {OidcClientsMethods} from "./OidcClientsMethods";
 
@@ -29,10 +28,6 @@ export interface OidcSettings {
    * Oidc-provider Options
    */
   options?: Configuration;
-  /**
-   * Injectable service to manage database connexion
-   */
-  Adapter?: Type<OidcAdapter>;
   /**
    * Injectable service to manage accounts
    */
