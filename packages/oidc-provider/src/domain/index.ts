@@ -1,4 +1,3 @@
-export * from "../../../adapters/src/domain/Adapter";
 export * from "./OidcAccountsMethods";
 export * from "./OidcClientsMethods";
 export * from "./OidcSettings";

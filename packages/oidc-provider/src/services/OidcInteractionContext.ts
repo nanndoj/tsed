@@ -2,9 +2,11 @@ import {Constant, PlatformContext, Provider, ProviderScope, Scope} from "@tsed/c
 import {Env} from "@tsed/core";
 import {Inject, Injectable} from "@tsed/di";
 import {Account, AnyObject, InteractionResults, PromptDetail} from "oidc-provider";
+import {INTERACTION_CONTEXT} from "../constants";
 import {OidcSession} from "../decorators";
 import {OidcInteraction} from "../domain";
 import {debug} from "../utils/debug";
+import {OidcInteractions} from "./OidcInteractions";
 import {OidcProvider} from "./OidcProvider";
 
 @Injectable()
@@ -14,7 +16,10 @@ export class OidcInteractionContext {
   env: Env;
 
   @Inject()
-  protected oidcProviderService: OidcProvider;
+  protected oidcProvider: OidcProvider;
+
+  @Inject()
+  protected oidcInteractions: OidcInteractions;
 
   @Inject()
   protected context: PlatformContext;
@@ -38,19 +43,29 @@ export class OidcInteractionContext {
   }
 
   $onInit() {
-    this.context.set("interactionContext", this);
+    this.context.set(INTERACTION_CONTEXT, this);
+  }
+
+  async runInteraction(name: string) {
+    const handler = this.oidcInteractions.getInteractionHandler(name);
+
+    if (handler) {
+      await handler(this.context);
+    }
   }
 
   async interactionDetails(): Promise<OidcInteraction> {
-    return this.oidcProviderService.raw.interactionDetails(this.context.getReq(), this.context.getRes());
+    this.raw = await this.oidcProvider.get().interactionDetails(this.context.getReq(), this.context.getRes());
+
+    return this.raw;
   }
 
   interactionFinished(result: InteractionResults, options: {mergeWithLastSubmission?: boolean} = {mergeWithLastSubmission: false}) {
-    return this.oidcProviderService.raw.interactionFinished(this.context.getReq(), this.context.getRes(), result, options);
+    return this.oidcProvider.get().interactionFinished(this.context.getReq(), this.context.getRes(), result, options);
   }
 
   interactionResult(result: InteractionResults, options: {mergeWithLastSubmission?: boolean} = {mergeWithLastSubmission: false}) {
-    return this.oidcProviderService.raw.interactionResult(this.context.getReq(), this.context.getRes(), result, options);
+    return this.oidcProvider.get().interactionResult(this.context.getReq(), this.context.getRes(), result, options);
   }
 
   setProviderSession(options: {
@@ -60,7 +75,7 @@ export class OidcInteractionContext {
     clients?: string[];
     meta?: AnyObject;
   }): InstanceType<Provider["Session"]> {
-    return this.oidcProviderService.raw.setProviderSession(this.context.getReq(), this.context.getRes(), options);
+    return this.oidcProvider.get().setProviderSession(this.context.getReq(), this.context.getRes(), options);
   }
 
   render(view: string, result: any) {
@@ -73,10 +88,10 @@ export class OidcInteractionContext {
 
   findClient(clientId?: string): InstanceType<Provider["Client"]> {
     if (clientId) {
-      return this.oidcProviderService.raw.Client.find(clientId);
+      return this.oidcProvider.get().Client.find(clientId);
     }
 
-    return this.oidcProviderService.raw.Client.find(this.params.clientId);
+    return this.oidcProvider.get().Client.find(this.params.client_id);
   }
 
   /**
@@ -93,7 +108,7 @@ export class OidcInteractionContext {
       return;
     }
 
-    return this.oidcProviderService.raw.Account.findAccount(undefined as any, sub!, token);
+    return this.oidcProvider.get().Account.findAccount(undefined as any, sub!, token);
   }
 
   debug(obj?: any): any {

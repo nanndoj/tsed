@@ -1,6 +1,5 @@
 import {Inject, InjectorService, PlatformApplication} from "@tsed/common";
 import {Module} from "@tsed/di";
-import {OidcSecureMiddleware} from "./middlewares/OidcSecureMiddleware";
 import {OidcAdapters} from "./services/OidcAdapters";
 import {OidcJwks} from "./services/OidcJwks";
 import {OidcProvider} from "./services/OidcProvider";
@@ -22,10 +21,6 @@ export class OidcModule {
     await this.oidcProvider.create();
   }
 
-  $beforeRoutesInit() {
-    this.app.use(OidcSecureMiddleware);
-  }
-
   async $afterRoutesInit() {
     const provider = this.oidcProvider.get();
 
@@ -39,7 +34,7 @@ export class OidcModule {
     const displayLog = (host: any) => {
       const url = typeof host.port === "number" ? `${host.protocol}://${host.address}:${host.port}` : "";
 
-      injector.logger.info(`[OIDC] WellKnown is available on ${url}/.well-known/openid-configuration`);
+      injector.logger.info(`WellKnown is available on ${url}/.well-known/openid-configuration`);
     };
 
     if (httpsPort) {

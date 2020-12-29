@@ -1,12 +1,6 @@
 import {PlatformTest} from "@tsed/common";
 import {expect} from "chai";
-import {Interactions} from "./interactions";
-
-@Interactions({
-  path: "/interaction/:uid",
-  children: []
-})
-class InteractionsCtrl {}
+import "../../test/app/controllers/oidc/InteractionsCtrl";
 
 describe("@Interactions", () => {
   beforeEach(() =>
